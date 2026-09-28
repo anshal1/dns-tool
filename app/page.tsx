@@ -197,12 +197,6 @@ export default function Home() {
 
         <footer className="mt-12 flex flex-col justify-between gap-3 border-t border-[#e3e6ea] py-6 text-xs text-[#9ba0a8] sm:flex-row">
           <span>Queries resolve through Node&apos;s DNS resolver.</span>
-          <a
-            href="https://github.com"
-            className="flex items-center gap-1.5 font-medium transition hover:text-[#555b64]"
-          >
-            View source <ArrowUpRight className="size-3.5" />
-          </a>
         </footer>
       </section>
     </main>
