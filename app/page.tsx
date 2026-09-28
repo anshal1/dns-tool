@@ -22,15 +22,18 @@ export default function Home() {
   const [nsRecords, setNsRecords] = useState<string[]>([]);
   const [txtRecords, setTxtRecords] = useState<string[][]>([]);
   const [loading, setLoading] = useState(false);
-  const [domain, setDomain] = useState("");
+  const [domain, setDomain] = useState("example.com");
+  const [errors, setErrors] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const domain = formData.get("domain") as string;
     if (!domain) return alert("Domain is required");
+    setLoading(true);
     setDomain(domain);
+    const errors: string[] = [];
+    setErrors(errors);
     const results = await Promise.allSettled([
       dnsLookup<string[]>(domain, "A"),
       dnsLookup<string[]>(domain, "AAAA"),
@@ -43,24 +46,24 @@ export default function Home() {
     const [a, aaa, cname, mx, ns, txt] = results;
 
     if (a.status === "fulfilled") setARecords(a.value);
-    else console.error("A:", a.reason);
+    else errors.push("A: " + a.reason);
 
     if (aaa.status === "fulfilled") setAAARecords(aaa.value);
-    else console.error("AAAA:", aaa.reason);
+    else errors.push("AAAA: " + aaa.reason);
 
     if (cname.status === "fulfilled") setCnameRecords(cname.value);
-    else console.error("CNAME:", cname.reason);
+    else errors.push("CNAME: " + cname.reason);
 
     if (mx.status === "fulfilled") setMxRecords(mx.value);
-    else console.error("MX:", mx.reason);
+    else errors.push("MX: " + mx.reason);
 
     if (ns.status === "fulfilled") setNsRecords(ns.value);
-    else console.error("NS:", ns.reason);
+    else errors.push("NS: " + ns.reason);
 
     if (txt.status === "fulfilled") setTxtRecords(txt.value);
-    else console.error("TXT:", txt.reason);
+    else errors.push("TXT: " + txt.reason);
+    setErrors(errors);
     setLoading(false);
-    console.log({ a, aaa, cname, mx, ns, txt });
   };
   return (
     <main className="min-h-screen bg-[#f7f8fa] text-[#17191d]">
@@ -73,13 +76,6 @@ export default function Home() {
             dnslookup<span className="text-[#a3a8b1]">.tools</span>
           </span>
         </div>
-        <button
-          className="flex items-center gap-2 text-sm font-medium text-[#6f757e] transition hover:text-[#17191d]"
-          type="button"
-        >
-          <CircleHelp className="size-4" />
-          How it works
-        </button>
       </header>
 
       <section className="mx-auto max-w-6xl px-5 pb-10 pt-12 md:px-8 md:pt-20">
@@ -122,7 +118,19 @@ export default function Home() {
             {loading ? "Looking up…" : "Lookup domain"}
           </button>
         </form>
-        {/*{error && <p role="alert" className="mt-3 text-sm font-medium text-[#c2414b]">{error}</p>}*/}
+        {errors.length > 0 && (
+          <>
+            {errors.map((error, index) => (
+              <p
+                key={index}
+                role="alert"
+                className="mt-3 text-sm font-medium text-[#c2414b]"
+              >
+                {error}
+              </p>
+            ))}
+          </>
+        )}
 
         {loading ? (
           <div className="w-full mt-16 flex flex-col items-center justify-between gap-4 pb-5 min-h-20">

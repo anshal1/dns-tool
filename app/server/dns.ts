@@ -6,6 +6,7 @@ export async function dnsLookup<T>(
   hostname: string,
   type: (typeof dnsRecordTypes)[number],
 ): Promise<T> {
+  if (!hostname) throw new Error("hostname is required");
   const data = await new Promise<T>((resolve, reject) => {
     dns.resolve(hostname, type, (err, addresses) => {
       if (err) reject(err);
