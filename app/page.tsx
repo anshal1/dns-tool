@@ -158,7 +158,7 @@ export default function Home() {
                 Looked up server-side
               </span>
             </div>
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="mt-6 grid gap-4 grid-cols-1 md:grid-cols-2">
               <DNSCard
                 label="IPv4 addresses"
                 description="Points a domain to an IPv4 address."
